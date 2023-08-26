@@ -1,0 +1,32 @@
+with "config/testpicoc_config.gpr";
+project Testpicoc is
+
+   for Library_Name use "Testpicoc";
+   for Library_Version use Project'Library_Name & ".so." & Testpicoc_Config.Crate_Version;
+
+   for Source_Dirs use ("src/", "config/");
+   for Object_Dir use "obj/" & Testpicoc_Config.Build_Profile;
+   for Create_Missing_Dirs use "True";
+   for Library_Dir use "lib";
+
+   for Target use "arm-eabi";
+   for Runtime ("ada") use "light-cortex-m0p";
+
+   type Library_Type_Type is ("relocatable", "static", "static-pic");
+   Library_Type : Library_Type_Type :=
+     external ("TESTPICOC_LIBRARY_TYPE", external ("LIBRARY_TYPE", "static"));
+   for Library_Kind use Library_Type;
+
+   package Compiler is
+      for Default_Switches ("Ada") use Testpicoc_Config.Ada_Compiler_Switches;
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Es"); --  Symbolic traceback
+   end Binder;
+
+   package Install is
+      for Artifacts (".") use ("share");
+   end Install;
+
+end Testpicoc;
